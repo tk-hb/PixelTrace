@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>29</SupportedOSPlatformVersion>
+    <IsBindingProject>true</IsBindingProject>
+    <RootNamespace>PixelTrace.Embedding</RootNamespace>
+    <AssemblyName>PixelTrace.Embedding</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- .NET 10 automatically includes Java sources, transforms and proguard.cfg. -->
+    <AndroidJavaSource Update="Java/LocalEmbedder.java" Bind="true" />
+    <AndroidMavenLibrary Include="com.google.ai.edge.litertlm:litertlm-android" Version="0.18.0" Repository="Google" Bind="false" />
+    <AndroidMavenLibrary Include="com.google.code.gson:gson" Version="2.14.0" Bind="false" />
+    <AndroidMavenLibrary Include="com.google.errorprone:error_prone_annotations" Version="2.48.0" Bind="false" />
+    <AndroidMavenLibrary Include="org.jetbrains.kotlin:kotlin-reflect" Version="2.4.0" Bind="false" />
+    <AndroidMavenLibrary Include="org.jetbrains.kotlin:kotlin-stdlib" Version="2.4.0" Bind="false" />
+    <AndroidMavenLibrary Include="org.jetbrains:annotations" Version="23.0.0" Bind="false" />
+    <AndroidMavenLibrary Include="org.jetbrains.kotlinx:kotlinx-coroutines-android" Version="1.11.0" Bind="false" />
+    <AndroidMavenLibrary Include="org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm" Version="1.11.0" Bind="false" />
+  </ItemGroup>
+</Project>

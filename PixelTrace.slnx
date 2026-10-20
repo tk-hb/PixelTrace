@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PixelTrace/PixelTrace.csproj" />
+  <Project Path="PixelTrace.Embedding/PixelTrace.Embedding.csproj" />
+  <Project Path="PixelTrace.Exchange/PixelTrace.Exchange.csproj" />
+</Solution>

@@ -1,0 +1,101 @@
+/*
+Audio playback and capture library. Choice of public domain or MIT-0. See license statements at the end of this file.
+miniaudio - v0.11.25 - 2026-03-04
+
+David Reid - mackron@gmail.com
+
+Website:       https://miniaud.io
+Documentation: https://miniaud.io/docs
+GitHub:        https://github.com/mackron/miniaudio
+*/
+
+/*
+Core Audio
+
+So far, Core Audio has been the worst backend to work with due to being both unintuitive and having almost no documentation
+apart from comments in the headers (which admittedly are quite good). For my own purposes, and for anybody out there whose
+needing to figure out how this darn thing works, I'm going to outline a few things here.
+
+Since miniaudio is a fairly low-level API, one of the things it needs is control over specific devices, and it needs to be
+able to identify whether or not it can be used as playback and/or capture. The AudioObject API is the only one I've seen
+that supports this level of detail. There was some public domain sample code I stumbled across that used the AudioComponent
+and AudioUnit APIs, but I couldn't see anything that gave low-level control over device selection and capabilities (the
+distinction between playback and capture in particular). Therefore, miniaudio is using the AudioObject API.
+
+Most (all?) functions in the AudioObject API take a AudioObjectID as its input. This is the device identifier. When
+retrieving global information, such as the device list, you use kAudioObjectSystemObject. When retrieving device-specific
+data, you pass in the ID for that device. In order to retrieve device-specific IDs you need to enumerate over each of the
+devices. This is done using the AudioObjectGetPropertyDataSize() and AudioObjectGetPropertyData() APIs which seem to be
+the central APIs for retrieving information about the system and specific devices.
+
+To use the AudioObjectGetPropertyData() API you need to use the notion of a property address. A property address is a
+structure with three variables and is used to identify which property you are getting or setting. The first is the "selector"
+which is basically the specific property that you're wanting to retrieve or set. The second is the "scope", which is
+typically set to kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyScopeInput for input-specific properties and
+kAudioObjectPropertyScopeOutput for output-specific properties. The last is the "element" which is always set to
+kAudioObjectPropertyElementMain in miniaudio's case. I don't know of any cases where this would be set to anything different.
+
+Back to the earlier issue of device retrieval, you first use the AudioObjectGetPropertyDataSize() API to retrieve the size
+of the raw data which is just a list of AudioDeviceID's. You use the kAudioObjectSystemObject AudioObjectID, and a property
+address with the kAudioHardwarePropertyDevices selector and the kAudioObjectPropertyScopeGlobal scope. Once you have the
+size, allocate a block of memory of that size and then call AudioObjectGetPropertyData(). The data is just a list of
+AudioDeviceID's so just do "dataSize/sizeof(AudioDeviceID)" to know the device count.
+*/
+
+/*
+Pink noise generation based on Tonic (public domain) with modifications. https://github.com/TonicAudio/Tonic/blob/master/src/Tonic/Noise.h
+
+This is basically _the_ reference for pink noise from what I've found: http://www.firstpr.com.au/dsp/pink-noise/
+*/
+
+/* MurmurHash3. Based on code from https://github.com/PeterScott/murmur3/blob/master/murmur3.c (public domain). */
+
+/*
+This software is available as a choice of the following licenses. Choose
+whichever you prefer.
+
+===============================================================================
+ALTERNATIVE 1 - Public Domain (www.unlicense.org)
+===============================================================================
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or distribute this
+software, either in source code form or as a compiled binary, for any purpose,
+commercial or non-commercial, and by any means.
+
+In jurisdictions that recognize copyright laws, the author or authors of this
+software dedicate any and all copyright interest in the software to the public
+domain. We make this dedication for the benefit of the public at large and to
+the detriment of our heirs and successors. We intend this dedication to be an
+overt act of relinquishment in perpetuity of all present and future rights to
+this software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <http://unlicense.org/>
+
+===============================================================================
+ALTERNATIVE 2 - MIT No Attribution
+===============================================================================
+Copyright 2026 David Reid
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/

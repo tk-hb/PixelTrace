@@ -1,0 +1,12 @@
+function(pixeltrace_android_device_discovery)
+    if(NOT ANDROID OR NOT TARGET onnxruntime_common)
+        message(FATAL_ERROR "PixelTrace device discovery requires the Android ONNX Runtime common target")
+    endif()
+    get_target_property(ort_sources onnxruntime_common SOURCES)
+    list(FILTER ort_sources EXCLUDE REGEX "/core/platform/(device_discovery_default|linux/device_discovery)\\.cc$")
+    set_property(TARGET onnxruntime_common PROPERTY SOURCES "${ort_sources}")
+    target_sources(onnxruntime_common PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/AndroidDeviceDiscovery.cpp")
+    target_link_libraries(onnxruntime_common PRIVATE ${CMAKE_DL_LIBS})
+endfunction()
+
+cmake_language(DEFER CALL pixeltrace_android_device_discovery)

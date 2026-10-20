@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>29</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PixelTrace.Mobile</RootNamespace>
+    <AssemblyName>PixelTrace</AssemblyName>
+    <ApplicationId>com.tkhb.pixeltrace</ApplicationId>
+    <ApplicationTitle>PixelTrace</ApplicationTitle>
+    <ApplicationVersion>7</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
+    <RuntimeIdentifier>android-arm64</RuntimeIdentifier>
+    <AndroidPackageFormats>apk</AndroidPackageFormats>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>14.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.26.0" />
+    <PackageReference Include="Tokenizers.HuggingFace" Version="3.23.1" ExcludeAssets="native" />
+    <AndroidNativeLibrary Include="../native/onnx/arm64-v8a/*.so" Abi="arm64-v8a" />
+    <AndroidAsset Include="../native/onnx/licenses/*" Link="licenses/onnx/%(Filename)%(Extension)" />
+    <AndroidNativeLibrary Include="../native/llama/arm64-v8a/*.so" Abi="arm64-v8a" />
+    <AndroidAsset Include="../native/llama/licenses/**/*" Link="licenses/llama/%(RecursiveDir)%(Filename)%(Extension)" />
+    <AndroidNativeLibrary Include="../native/usearch/arm64-v8a/*.so" Abi="arm64-v8a" />
+    <AndroidAsset Include="../native/usearch/licenses/*" Link="licenses/usearch/%(Filename)%(Extension)" />
+    <AndroidAsset Include="../PixelTrace.Exchange/Licenses/*.txt" Link="licenses/exchange/%(Filename)%(Extension)" />
+    <ProjectReference Include="../PixelTrace.Embedding/PixelTrace.Embedding.csproj" />
+    <ProjectReference Include="../PixelTrace.Exchange/PixelTrace.Exchange.csproj" />
+  </ItemGroup>
+  <Target Name="ValidateNativeRuntimes" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <ItemGroup>
+      <RequiredNativeRuntime Include="$(MSBuildProjectDirectory)/../native/onnx/arm64-v8a/libonnxruntime.so;$(MSBuildProjectDirectory)/../native/onnx/arm64-v8a/libonnxruntime_providers_webgpu.so;$(MSBuildProjectDirectory)/../native/onnx/arm64-v8a/libtokenizers_proto.so;$(MSBuildProjectDirectory)/../native/onnx/arm64-v8a/libc++_shared.so">
+        <BuildScript>tools/Build-OnnxRuntime.ps1</BuildScript>
+      </RequiredNativeRuntime>
+      <RequiredNativeRuntime Include="$(MSBuildProjectDirectory)/../native/llama/arm64-v8a/libpixeltrace_llama.so">
+        <BuildScript>tools/Build-LlamaRuntime.ps1</BuildScript>
+      </RequiredNativeRuntime>
+      <RequiredNativeRuntime Include="$(MSBuildProjectDirectory)/../native/usearch/arm64-v8a/libusearch_c.so;$(MSBuildProjectDirectory)/../native/usearch/arm64-v8a/libnumkong.so">
+        <BuildScript>tools/Build-SearchRuntime.ps1</BuildScript>
+      </RequiredNativeRuntime>
+    </ItemGroup>
+    <Error Code="PT1001" Condition="!Exists('%(RequiredNativeRuntime.Identity)')" Text="필수 네이티브 라이브러리가 없습니다: %(RequiredNativeRuntime.Filename)%(RequiredNativeRuntime.Extension). %(RequiredNativeRuntime.BuildScript)로 먼저 준비해 주세요." />
+  </Target>
+</Project>
